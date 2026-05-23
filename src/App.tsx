@@ -32,6 +32,9 @@ const RevenueAdmin = lazy(() => import('./pages/admin/RevenueAdmin'));
 const AnalyticsAdmin = lazy(() => import('./pages/admin/AnalyticsAdmin'));
 const ContactsAdmin = lazy(() => import('./pages/admin/ContactsAdmin'));
 const SettingsAdmin = lazy(() => import('./pages/admin/SettingsAdmin'));
+const ArticlesAdmin = lazy(() => import('./pages/admin/ArticlesAdmin'));
+const MediaAdmin = lazy(() => import('./pages/admin/MediaAdmin'));
+const SEOAdmin = lazy(() => import('./pages/admin/SEOAdmin'));
 
 // Loading fallbacks
 const AdminLoader = () => (
@@ -112,6 +115,9 @@ export default function App() {
                         <Route path="analytics" element={<AnalyticsAdmin />} />
                         <Route path="contacts" element={<ContactsAdmin />} />
                         <Route path="settings" element={<SettingsAdmin />} />
+                        <Route path="articles" element={<ArticlesAdmin />} />
+                        <Route path="media" element={<MediaAdmin />} />
+                        <Route path="seo" element={<SEOAdmin />} />
                       </Route>
                     </Route>
                   </Routes>

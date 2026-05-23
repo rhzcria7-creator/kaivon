@@ -5,7 +5,8 @@ const links = [
   { path: '/projects', label: 'Projects' },
   { path: '/about', label: 'About' },
   { path: '/contact', label: 'Contact' },
-  { path: '/socials', label: 'Socials' }
+  { path: '/socials', label: 'Socials' },
+  { path: '/dashboard', label: 'Dashboard' }
 ];
 
 export default function Navbar() {

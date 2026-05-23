@@ -83,7 +83,7 @@ export default function CardNav({ links }: CardNavProps) {
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 h-[60px] w-[90%] max-w-[500px] rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 shadow-lg flex items-center justify-between px-6 pointer-events-auto"
+        className="fixed top-6 left-1/2 -translate-x-1/2 z-50 h-[60px] w-[90%] max-w-[560px] rounded-2xl bg-white/60 backdrop-blur-xl border border-white/20 shadow-lg flex items-center justify-between px-6 pointer-events-auto"
       >
         <NavLink to="/" onClick={closeMenu} className="text-sm font-bold tracking-widest uppercase text-[#111]">
           <BlurText text="KAIVON" delay={100} animateBy="letters" />

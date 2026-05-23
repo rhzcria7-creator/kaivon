@@ -8,6 +8,21 @@ import path from 'path';
 import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
+
+// Load environment variables from .env if present
+dotenv.config();
+
+// Determine database path and resolve it to an absolute URL to avoid issues under Cloud Run environment
+let databaseUrl = process.env.DATABASE_URL || 'file:./dev.db';
+if (databaseUrl.startsWith('file:')) {
+  const relativePath = databaseUrl.replace(/^file:/, '');
+  const absolutePath = path.resolve(process.cwd(), relativePath);
+  databaseUrl = `file:${absolutePath}`;
+}
+
+process.env.DATABASE_URL = databaseUrl;
+console.log(`[DATABASE] Active DATABASE_URL registered: ${process.env.DATABASE_URL}`);
 
 const prisma = new PrismaClient();
 const app = express();
