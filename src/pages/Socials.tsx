@@ -26,7 +26,7 @@ export default function Socials() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 w-full">
           {networks.map((net, i) => (
-            <a key={i} href={net.link} className="block group">
+            <a key={i} href={net.link} target="_blank" rel="noopener noreferrer" aria-label={`Follow on ${net.name}`} className="block group">
               <BorderGlow
                 glowColor="250 80 60"
                 backgroundColor="rgba(255, 255, 255, 0.8)"

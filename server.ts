@@ -9,6 +9,7 @@ import fs from 'fs';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
+import { z } from 'zod';
 
 // Load environment variables from .env if present
 dotenv.config();
@@ -32,11 +33,21 @@ const JWT_SECRET = process.env.JWT_SECRET || 'dev-secret-key-change-in-prod';
 
 // Global Middlewares
 app.use(helmet({
-  contentSecurityPolicy: false, // Vite uses inline scripts in dev
-  frameguard: false,            // Allow rendering inside iframes for AI Studio preview environment
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"], // Needed for Vite dev/preview and React
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      connectSrc: ["'self'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false, // Prevents loading external resources smoothly
+  frameguard: false,                // Allow rendering inside iframes for AI Studio preview environment
 }));
-app.use(cors());
-app.use(express.json());
+app.use(cors({ origin: true, credentials: true })); // Allow proper CORS matching with credentials
+app.use(express.json({ limit: '10mb' })); // Protect against large payload DDOS
 app.use(cookieParser());
 
 // Debugging Request Logger Middleware
@@ -75,6 +86,21 @@ const authenticateToken = (req: any, res: any, next: any) => {
   });
 };
 
+// Zod schemas
+const loginSchema = z.object({
+  email: z.string().email().optional().default('admin@kaivon.os'),
+  password: z.string().min(8)
+});
+
+const projectSchema = z.object({
+  title: z.string().min(2).max(100),
+  description: z.string().min(10).max(1000),
+  tags: z.string().optional().default(''),
+  category: z.string().min(2),
+  year: z.string().min(4),
+  status: z.string().optional().default('DRAFT')
+});
+
 // Seed initial admin user if not exists
 async function seedAdmin() {
   const adminCount = await prisma.user.count();
@@ -94,9 +120,9 @@ seedAdmin().catch(console.error);
 
 // API Routes
 app.post('/api/auth/login', async (req, res) => {
-  const { password, email = 'admin@kaivon.os' } = req.body;
-
   try {
+    const { password, email } = loginSchema.parse(req.body);
+
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
@@ -115,6 +141,10 @@ app.post('/api/auth/login', async (req, res) => {
 
     res.json({ success: true, email: user.email });
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid input data', details: err.issues });
+    }
+    console.error(err);
     res.status(500).json({ error: 'Internal server error' });
   }
 });
@@ -136,17 +166,23 @@ app.get('/api/projects', async (req, res) => {
     });
     res.json(projects);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: 'Failed to fetch projects' });
   }
 });
 
 app.post('/api/projects', authenticateToken, async (req, res) => {
   try {
+    const body = projectSchema.parse(req.body);
     const project = await prisma.project.create({
-      data: req.body
+      data: body
     });
     res.status(201).json(project);
   } catch (err) {
+    if (err instanceof z.ZodError) {
+      return res.status(400).json({ error: 'Invalid input data', details: err.issues });
+    }
+    console.error(err);
     res.status(500).json({ error: 'Failed to create project' });
   }
 });

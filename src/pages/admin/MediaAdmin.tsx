@@ -188,7 +188,8 @@ export default function MediaAdmin() {
                       <a
                         href={file.url}
                         target="_blank"
-                        rel="noreferrer"
+                        rel="noopener noreferrer"
+                        aria-label="Open original file"
                         className="p-3 bg-neutral-800 text-white hover:bg-neutral-700 border border-white/5 rounded-xl transition-all"
                       >
                         <ExternalLink className="w-4 h-4" />
